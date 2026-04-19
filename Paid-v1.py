@@ -44,19 +44,40 @@ proxs = []    # প্রক্সি লিস্ট
 
 def update():
     try:
-        # গিটহাব থেকে ভার্সন ফাইল চেক করা
-        ver_check = requests.get("https://raw.githubusercontent.com/SIFAT-VAI143/version/main/ver.txt").text
-        current_ver = "1.5" # এই টুলের বর্তমান ভার্সন
+        url = "https://raw.githubusercontent.com/w8Shahin/FB_clone_id/main/Ver.txt"
         
-        if current_ver not in ver_check:
-            print("[*] Updating Tool...")
-            os.system("git pull")
-            print("[*] Update Done. Please Restart.")
-            sys.exit()
-    except:
-        pass
+        res = requests.get(url, timeout=10)
 
-# বাইটকোডের source: 11 অনুযায়ী
+        if res.status_code == 200:
+            ver_check = res.text.strip()
+            current_ver = "1.5"
+
+            if current_ver != ver_check:
+                print("[*] New update found...")
+                time.sleep(1)
+
+                # check git repo exists কিনা
+                if os.path.exists(".git"):
+                    os.system("git pull")
+                    print("[*] Update completed successfully!")
+                    print("[*] Restart the tool to apply changes.")
+                else:
+                    print("[!] Git repo not found. Please re-clone tool.")
+
+                sys.exit()
+            else:
+                print("[*] Tool is up to date.")
+
+        else:
+            print("[!] Failed to check update (server error).")
+
+    except requests.exceptions.ConnectionError:
+        print("[!] No internet connection.")
+    except requests.exceptions.Timeout:
+        print("[!] Request timeout, try again later.")
+    except Exception as e:
+        print(f"[!] Update error: {e}")
+
 def get_proxies():
     try:
         # প্রক্সিস্ক্রেপ থেকে লেটেস্ট SOCKS4 প্রক্সি ডাউনলোড করা
@@ -67,11 +88,41 @@ def get_proxies():
         print("[!] Proxy download failed.")
 
 def ugen():
-    # এখানে শত শত Samsung ডিভাইসের লিস্ট আছে
-    device_list = ['GT-1015', 'GT-1020', 'SM-G950F', 'SM-J701F'] # সংক্ষেপিত
-    android_version = str(random.randint(4, 13))
-    fb_version = f"{random.randint(100, 400)}.0.0.{random.randint(1, 20)}"
-    ua = f"Dalvik/2.1.0 (Linux; U; Android {android_version}; {random.choice(device_list)} Build/QP1A) [FBAN/FB4A;FBAV/{fb_version};]"
+    device_list = [
+        "SM-G950F", "SM-G960F", "SM-A505F", "SM-A705F",
+        "Redmi Note 8", "Redmi Note 9 Pro", "Redmi 9",
+        "RMX1911", "CPH1909", "Vivo 1906"
+    ]
+
+    android_versions = ["7.0", "8.1", "9", "10", "11", "12", "13"]
+
+    build_ids = [
+        "NRD90M", "OPM1", "PKQ1", "QP1A", "RP1A", "SP1A", "TP1A"
+    ]
+
+    locales = ["en_US", "en_GB", "bn_BD", "hi_IN"]
+
+    densities = ["2.0", "2.5", "3.0", "3.5"]
+    resolutions = ["720x1280", "1080x1920", "1080x2340"]
+
+    device = random.choice(device_list)
+    android = random.choice(android_versions)
+    build = random.choice(build_ids)
+    locale = random.choice(locales)
+    density = random.choice(densities)
+    width, height = random.choice(resolutions).split("x")
+
+    fb_version = f"{random.randint(250,400)}.0.0.{random.randint(10,80)}.{random.randint(1,200)}"
+
+    ua = (
+        f"Dalvik/2.1.0 (Linux; U; Android {android}; {device} Build/{build}) "
+        f"[FBAN/FB4A;FBAV/{fb_version};"
+        f"FBBV/{random.randint(100000000,999999999)};"
+        f"FBDM={{density={density},width={width},height={height}}};"
+        f"FBLC/{locale};FBCR/GP;FBMF/{device.split()[0]};"
+        f"FBBD/{device.split()[0]};FBPN/com.facebook.katana;]"
+    )
+
     return ua
 
 # বাইটকোডের source: 72 এবং 99 অনুযায়ী
